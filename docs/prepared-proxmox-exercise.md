@@ -70,7 +70,9 @@ cases passed after the shared transport changes. Ruff lint/format, dependency ch
 offline configuration validation, actionlint and staged wheel/sdist/install/resource
 smoke checks passed. The final targeted guest suite was rerun after tightening
 per-guest tool-version checks. The package smoke now checks the guest agent/CLI and
-preparation examples are shipped. GitHub-hosted execution remains untested.
+preparation examples are shipped. The shared Docker recovery and offline checks
+have subsequently [passed on GitHub-hosted runners](ci.md#verified-hosted-execution-13-november-2026);
+this adds no live Proxmox guest validation.
 Final Docker evidence is retained at
 `~/.local/state/rehearsal-final-docker-20261113-e118/`; its successful recovery took
 32.005019 seconds and the altered-record case failed as expected. Both cleaned up,

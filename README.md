@@ -18,9 +18,11 @@ Public [GitHub-hosted CI](docs/ci.md) and the
 [prepared Proxmox guest transport](docs/prepared-proxmox-exercise.md) are now
 implemented locally. The latter shares the recovery workflow but has only offline
 contract validation; guest preparation/power/provisioning and live acceptance are
-separate gates. CI has not run on GitHub; publication encountered an email-privacy
-push restriction, recorded in [the CI runbook](docs/ci.md). No lab deployment or VM
-mutation occurred.
+separate gates. Both public CI jobs have now passed on GitHub-hosted Ubuntu,
+including real Docker recovery and altered-record rejection. The
+[CI record](docs/ci.md#verified-hosted-execution-13-november-2026) links the exact
+tested commit, inspected metadata artifacts and email-privacy resolution. No lab
+deployment or VM mutation occurred.
 
 **13 November 2026:** the [investigation handoff](docs/investigation-2026-11-13.md)
 supersedes the historical snapshot below. Supplied host evidence establishes two

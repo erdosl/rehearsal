@@ -1,5 +1,23 @@
 # Changelog
 
+## Public CI publication and verification — 13 November 2026
+
+Resolve GH007 with explicitly authorized email-only rewriting of five unpublished
+commits. Obtain the noreply address from GitHub's signed initial commit/account
+mapping, configure it only for this repository, retain a local-only backup and
+full old-to-new mapping, and verify identical trees/messages/order/dates. Preserve
+other identities, published history, global configuration and privacy settings.
+Publish normally without force; no local suite rerun solely for metadata changes.
+
+GitHub-hosted run **43513561091**, SHA `d73652c87921af007b99192d2de7525898369671`,
+passed both offline and Docker jobs. Real recovery verified 100 orders, SQL/schema/
+restored API and the separate canary; altered-customer verification failed as
+intended at the same row count, with its test passing. Both run cleanups and the
+independent cleanup step passed. Downloaded artifact ZIPs/digests and all JSON fields
+were inspected: only the three intended metadata files, no dumps/credentials/raw
+reports. See [exact mapping, job links and evidence](docs/ci.md#verified-hosted-execution-13-november-2026).
+No lab access, mutation, renewal, journal change, VM start or deployment occurred.
+
 ## Controlled boot retest preparation — 13 November 2026
 
 Collect bounded read-only PVE/controller state through verified existing SSH and
