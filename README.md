@@ -18,12 +18,14 @@ Public [GitHub-hosted CI](docs/ci.md) and the
 [prepared Proxmox guest transport](docs/prepared-proxmox-exercise.md) are now
 implemented locally. The latter shares the recovery workflow but has only offline
 contract validation; guest preparation/power/provisioning and live acceptance are
-separate gates. CI has not run on GitHub. No lab deployment or VM mutation occurred.
+separate gates. CI has not run on GitHub; publication encountered an email-privacy
+push restriction, recorded in [the CI runbook](docs/ci.md). No lab deployment or VM
+mutation occurred.
 
 **13 November 2026:** the [investigation handoff](docs/investigation-2026-11-13.md)
 supersedes the historical snapshot below. Supplied host evidence establishes two
 VirtualBox NULL-pointer faults; root cause and a fix remain unresolved. VM 9000
-was last observed stopped/disconnected, with resources retained and historical
+is freshly verified stopped/disconnected, with resources retained and historical
 task outcomes unavailable. Live nested-start validation requires a separate
 explicit operator decision. Local development adds append-only request timing,
 HTTP/transport and UPID-provenance evidence with offline tests; these changes have
@@ -31,6 +33,8 @@ not been deployed. The recorded bootstrap expiry, 13 November at 15:08:20 UTC, h
 passed. No credentials or infrastructure were changed during this development.
 The subsequent [offline review and fixes](CHANGELOG.md) cover crash recovery,
 credential handling, journal compatibility and explicit outcome provenance.
+The [controlled boot retest plan](docs/controlled-boot-retest.md) records the new
+21:05–21:09 UTC read-only snapshot and exact approval gates. It has not been run.
 
 **Historical deployment/build snapshot, 12 November:**
 
@@ -87,7 +91,7 @@ Proxmox Backup Server (PBS) are separate later work.
 
 Use `rehearsal-lvm` for planned template and test disks. The [first nested guest/template plan](docs/nested-guest.md) selects Ubuntu 24.04, 1 vCPU, 2 GiB RAM and a 12 GiB disk, replacing the earlier 6 GiB estimate. The 90 GiB pool budgets 18 GiB reserve, 36 GiB for template plus two full clones and 2 GiB auxiliary allowance, leaving 34 GiB unassigned. The VG's separate 8 GiB unallocated space is not pool capacity. **The initial physical backing-capacity gate for `pve01` is satisfied**: user-supplied host evidence confirms both dynamic VDIs under `/mnt/ssd`, with **636 GB available**. Continue monitoring actual host space as they grow; `dev01` and `rehearsal01` disk locations remain unverified. Initially allow one run and one running nested guest, with two workload VMs only after later isolation/capacity validation.
 
-The operator completed `REHEARSAL-TEST`: PVE vmbr1/enp0s16 and controller enp0s9 at `10.77.0.1/24`. [Platform reboot persistence](docs/firewall-isolation.md) passed with actual legacy hooks and both guards, fresh management/API access and routing forwarding disabled. Fresh supplied host capacity later passed admission; only VM 9000 and its two owned volumes were created. Exact guest rules/allow tuples were installed while stopped, with automatic rollback armed before each guard update and canceled after fresh checks. **Guest packet enforcement remains untested**, and PVE's current state is unreadable after the new start following operator recovery. Controller filtering/access remain verified. Existing inventory credentials/ACLs/release are preserved; bootstrap expiry is **2026-11-13 15:08:20 UTC**. [Resource/task IDs, deployment and recovery gate](docs/supervised-build.md) are recorded separately.
+The operator completed `REHEARSAL-TEST`: PVE vmbr1/enp0s16 and controller enp0s9 at `10.77.0.1/24`. [Platform reboot persistence](docs/firewall-isolation.md) passed with actual legacy hooks and both guards, fresh management/API access and routing forwarding disabled. Fresh supplied host capacity later passed admission; only VM 9000 and its two owned volumes were created. Exact guest rules/allow tuples were installed while stopped, with automatic rollback armed before each guard update and canceled after fresh checks. **Guest packet enforcement remains untested**; the new [read-only snapshot](docs/controlled-boot-retest.md) verifies PVE reachable and VM 9000 stopped without settling historical task outcomes. Controller filtering/access remain verified. Existing inventory credentials/ACLs/release are preserved; bootstrap expiry is **2026-11-13 15:08:20 UTC**. [Resource/task IDs, deployment and recovery gate](docs/supervised-build.md) are recorded separately.
 
 ## Development and delivery order
 

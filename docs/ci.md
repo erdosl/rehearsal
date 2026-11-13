@@ -82,3 +82,28 @@ actionlint **1.7.12**, downloaded from the primary release with its release chec
 verified, without installing a system package. Both underlying jobs and the cleanup/
 export commands were run locally. **GitHub-hosted execution remains untested**;
 these workflow files have not been pushed and no remote success is claimed.
+
+## Publication attempt, 13 November 2026
+
+Verified public repository `erdosl/rehearsal`, authenticated account `erdosl`,
+unprotected default branch `main` and no applicable branch rules/PR requirement.
+Fetched remote main at `2f763cceb61c8c2becaff0a05d84ff0f20ddddaf`; no incoming
+commits. The four outgoing commits include the prerequisite investigation review
+`f092acb` and reviewed milestones `7a99ede`, `efc4411`, `5160da3`. Inspected outgoing
+content for credential material, private keys, backups, binary/runtime state and
+raw evidence; none was found. LICENSE is unchanged.
+
+GitHub rejected the normal fast-forward push with **GH007**, protecting a private
+commit email. Nothing was published and no Actions run exists from this attempt.
+This is a publication blocker, not a failed CI job. History and account/repository
+settings remain unchanged. Resolving it requires an explicit operator decision;
+do not bypass privacy protection or rewrite reviewed commits automatically. See
+GitHub's [email-privacy push policy](https://docs.github.com/en/account-and-profile/how-tos/email-preferences/blocking-command-line-pushes-that-expose-your-personal-email-address).
+
+After resolution, push normally, inspect both jobs on the exact resulting SHA,
+and download only their metadata artifacts into a new private directory. Verify
+the archive member names and allowlisted JSON fields against the exporter, both
+recovery outcomes (including expected altered-field failure), and the independent
+cleanup step. Record run URLs/tested SHAs; workflow presence or local checks alone
+are not remote execution evidence. No remote artifact/cleanup success is claimed
+while publication is blocked.

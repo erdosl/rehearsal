@@ -1,5 +1,26 @@
 # Changelog
 
+## Controlled boot retest preparation — 13 November 2026
+
+Collect bounded read-only PVE/controller state through verified existing SSH and
+the original verified-TLS inventory. Confirm VM 9000 stopped/disconnected, exact
+ownership/volumes, healthy reported pool state, loaded firewall guards and the
+unchanged uncertain historical operation. Bootstrap expiry has passed; controller
+NTP reports unsynchronized. Journal hash/mtime remain unchanged. No host access,
+VM power action, credential renewal, state modification or deployment occurred.
+
+Add a concrete separately authorizable one-boot procedure with fresh host capacity/
+health and clock gates, expiry-only renewal, evidence-preserving historical archival,
+passive serial proof, one start, bounded exact-task reconciliation, explicit abort/
+owned end-state authority and private evidence retention. Preserve the one-guest
+ceiling and unresolved root cause; neither CPU count nor maintenance proves a fix.
+
+The authorized publication attempt was rejected by GitHub GH007 email privacy;
+reviewed local commits/history/settings remain intact and no hosted run is claimed.
+Validation: 354 offline tests passed; Ruff lint/format, dependency verification,
+package smoke, actionlint 1.7.12, local links and runbook shell/Python/JSON syntax
+checks passed. Future mutation/capture snippets were not executed against the lab.
+
 ## Prepared Proxmox guests — offline integration slice
 
 Share the actual recovery orchestration, manifest, SQL/schema/API verifier, native

@@ -9,6 +9,11 @@ UPIDs do not independently prove HTTP response provenance. Do not repeat complet
 task searches without new evidence or start any nested guest without a separate
 explicit operator decision. Bootstrap expiry has passed; no renewal is implied.
 
+The [21:05–21:09 UTC read-only snapshot and one-boot procedure](controlled-boot-retest.md)
+now verify current reachability, stopped/disconnected ownership, storage, guards
+and retained uncertain journal state. That new snapshot does not resolve either
+historical task. No retest, renewal, journal transition or deployment was executed.
+
 ## Offline request evidence, 13 November 2026
 
 Implemented locally and tested offline, **not deployed or live-validated**. The

@@ -241,3 +241,9 @@ No step below is authorized or executed by this development task.
 **The next operator decision is whether to authorize that single controlled boot
 retest under a named evidence/abort plan.** It is not permission to run this guest
 exercise, change allocations or assume the host fault has been fixed.
+
+The [one-boot operator runbook](controlled-boot-retest.md) now supplies the dated
+read-only VM-9000 snapshot, exact retained operation identity, expiry/archival gates,
+host capture commands and bounded start/abort/end-state procedure. It remains
+unexecuted; the one-running-guest ceiling and this adapter's separate two-guest
+admission gate remain unchanged.

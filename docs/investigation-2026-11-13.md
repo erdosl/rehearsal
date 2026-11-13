@@ -7,6 +7,13 @@ in the 12 November build records; those records remain historical evidence.
 The [offline code review](../CHANGELOG.md) adds no new infrastructure observation,
 deployment or live nested-start result and makes no claim that the fault is fixed.
 
+**Later read-only refresh, 21:05–21:09 UTC:** the new
+[controlled-boot runbook](controlled-boot-retest.md) records independently collected
+current lab state, separately from this supplied historical handoff. VM 9000 is
+stopped/disconnected with matching retained ownership/disks, PVE/controller are
+reachable, and the historical pending operation remains uncertain. No start,
+credential renewal, journal modification or host maintenance was performed.
+
 ## Established mechanism and unresolved cause
 
 The supplied host evidence identifies two NULL-pointer write faults in VirtualBox
@@ -129,8 +136,8 @@ remain future work.
 separate explicit operator decision is required before attempting it. Do not
 rerun supervised automation, start 9000, repeat imports, delete retained resources,
 clear reconciliation state or change hypervisor allocations/settings during
-development. Refresh current resource state read-only only if needed; no such
-refresh was necessary for this implementation. Codex does not administer ubase;
+development. The later read-only refresh above supersedes the absence of a fresh
+resource observation in this historical handoff. Codex does not administer ubase;
 any separately requested host instructions must use vim and grep, not ripgrep.
 
 Supplied evidence locations, not assumed accessible from the development checkout:
