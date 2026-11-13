@@ -1,0 +1,2 @@
+# Optional application only; inventory runtime remains unchanged.
+psycopg[binary]==3.3.9

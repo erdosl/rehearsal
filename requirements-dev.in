@@ -1,6 +1,7 @@
 # Runtime dependencies plus development/build tools.
 # Regenerate the platform-specific hashed lock as documented in docs/development.md.
 -r requirements-runtime.in
+-r requirements-exercise.in
 build==1.6.1
 pytest==9.2.0
 ruff==0.17.4

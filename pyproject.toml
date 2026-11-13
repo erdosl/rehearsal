@@ -12,8 +12,12 @@ license = "Apache-2.0"
 license-files = ["LICENSE"]
 dependencies = ["httpx==0.28.1"]
 
+[project.optional-dependencies]
+exercise = ["psycopg[binary]==3.3.9"]
+
 [project.scripts]
 rehearsal = "rehearsal.cli:main"
+rehearsal-exercise = "rehearsal_exercise.__main__:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
@@ -23,10 +27,13 @@ version = {attr = "rehearsal.__version__"}
 
 [tool.setuptools.package-data]
 rehearsal = ["fixtures/*.json"]
+rehearsal_orders = ["schema.sql"]
+rehearsal_exercise = ["images.toml"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts = "-ra --strict-config --strict-markers"
+markers = ["docker: explicitly enabled local Docker recovery integration"]
 
 [tool.ruff]
 target-version = "py312"

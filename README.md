@@ -6,6 +6,14 @@ This is a portfolio and learning project for Linux/platform engineering: Proxmox
 
 ## Status
 
+The local [PostgreSQL application recovery exercise](docs/local-postgres-exercise.md)
+implements a synthetic order API, deterministic independent manifest, native
+backup, separate Docker restore instance, SQL/schema/API verification, a separate
+post-restore canary and owned cleanup. It runs on dev01 without Proxmox or controller
+changes. See the runbook for exact opt-ins, image pins, retained artifacts and
+measured exercise recovery duration boundaries. Guest deployment, worker and
+infrastructure recovery remain future work.
+
 **13 November 2026:** the [investigation handoff](docs/investigation-2026-11-13.md)
 supersedes the historical snapshot below. Supplied host evidence establishes two
 VirtualBox NULL-pointer faults; root cause and a fix remain unresolved. VM 9000
@@ -41,11 +49,14 @@ python3 -m venv .venv
 .venv/bin/ruff format --check src tests tools
 ```
 
-Only initial installation needs a package index or cached wheels. **HTTPX is the single direct runtime dependency**, providing HTTPS, explicit timeouts and mock transports; runtime/development dependencies have separate hashed locks for Linux x86_64/Python 3.12. Fixture output remains **SIMULATED**, including `"simulated": true` in JSON. It is not an inspection of `pve01`. There is no automatic backend fallback.
+Only initial installation needs a package index or cached wheels. **HTTPX is the single direct inventory runtime dependency**, providing HTTPS, explicit timeouts and mock transports; runtime/development dependencies have separate hashed locks for Linux x86_64/Python 3.12. The development lock also installs optional Psycopg for the local order application; inventory's runtime lock is unchanged. Fixture output remains **SIMULATED**, including `"simulated": true` in JSON. It is not an inspection of `pve01`. There is no automatic backend fallback.
 
 See [development and usage](docs/development.md) for configuration, fixtures, checks and packaging. The [live inventory runbook](docs/live-inventory.md) specifies PVE 9.2.2 ACLs, token privilege separation, certificate trust and independent controller deployment. Live access requires `--backend live`, `--live` and `REHEARSAL_LIVE=1`; configuration validation and fixture commands remain offline.
 
 ## Intended workflow
+
+This remains the planned guest workflow. The independent local Docker slice is
+implemented separately; it does not satisfy the nested-guest acceptance gates.
 
 1. Validate configuration and check capacity, API permissions and isolation.
 2. Allocate an isolated, disposable environment through the Proxmox API.
@@ -55,7 +66,14 @@ See [development and usage](docs/development.md) for configuration, fixtures, ch
 6. Retain logs, task identifiers, timings and a structured report outside test VMs.
 7. Delete only resources proven to belong to that run, including after interruption.
 
-The first recovery exercise will take a PostgreSQL logical backup, remove access to the source, restore into a separate isolated target, and compare recovered records with an independently retained manifest. It will report measured recovery duration and its limits. VM backup/restore and Proxmox Backup Server (PBS) are separate later exercises; PBS is not required initially.
+The local version of the first recovery exercise now takes a PostgreSQL logical
+backup, stops the source, restores into a separate isolated target and compares
+recovered records with an independently retained manifest. Its real local validation
+recovered 100 orders and passed the separate canary; measured exercise recovery
+duration was 30.17 seconds, with owned cleanup complete. An altered-field negative
+case failed verification as intended. The [runbook](docs/local-postgres-exercise.md)
+records boundaries and limitations. Guest deployment, VM backup/restore and
+Proxmox Backup Server (PBS) are separate later work.
 
 ## Proposed deployment
 

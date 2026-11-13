@@ -1,5 +1,23 @@
 # Proposed architecture
 
+## Implemented local application slice — 13 November 2026
+
+The [local PostgreSQL exercise](local-postgres-exercise.md) implements a separate
+dev01 execution transport without the Proxmox adapter or controller state. It uses
+Python 3.12, optional Psycopg 3.3.9, standard-library HTTP and pinned PostgreSQL 18.7
+with matching native clients. Two internal Docker networks and independent volumes
+separate source/restore. A host-side intended manifest precedes seeding; source
+writes are quiesced, backup retained, source stopped, target identity checked,
+then restored SQL/schema/API data verified before a distinct canary write/read.
+The runbook defines monotonic timing boundaries, local evidence, failure handling
+and exact ownership cleanup. JSON state snapshots plus append-only intent/events
+reuse installation/run/resource UUID and nonce conventions without importing the
+VM-9000-specific journal. Recovery execution is never resumed blindly; only
+interrupted owned cleanup can continue. The original VM architecture below remains
+planned: worker, systemd guest installation, executor, upgrades and VM recovery are
+not delivered by the local slice. PostgreSQL 16/FastAPI below are guest proposals,
+not dependencies of the local exercise.
+
 **13 November 2026:** [the supplied investigation handoff](investigation-2026-11-13.md)
 supersedes the infrastructure status below. Live nested-start validation is blocked
 by unresolved host faults and needs a separate explicit operator decision.

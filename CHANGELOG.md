@@ -1,5 +1,64 @@
 # Changelog
 
+## Recovery milestone review — 13 November 2026
+
+Reviewed source/target separation, independent intended input, SQL/schema/API
+checks, credentials, interruption, retained artifacts and packaging before the
+first recovery commit. Fix subsecond timestamp loss and numeric-type equality in
+verification; validate constraint definitions/enforcement and index definitions.
+Keep nonzero Docker creation outcomes unresolved until reconciled; refuse image
+tag collisions. Missing status paths no longer create run directories. Suppress
+arbitrary socketserver exception details. Add targeted regressions and a repeatable
+offline `tools/package_smoke.py` command.
+
+The reported 316-test baseline and retained real Docker reports/checksums were
+verified. Review validation: 325 offline tests, two real Docker integration cases,
+Ruff, dependency checks and staged package/install smoke checks passed locally.
+No lab access or deployment; host faults remain temporally associated with starts,
+with root cause unresolved and no established fix after component/kernel changes.
+
+## Unreleased — 13 November 2026 local PostgreSQL exercise
+
+- Add a synchronous synthetic-order API, explicit v1 SQL initialization, database
+  readiness separate from HTTP liveness, stable-ID create/read and safe retries.
+- Add an independent intended-input manifest, exact SQL/API comparisons, schema
+  and constraint checks, and a separately retained post-restore write/read canary.
+- Add a dedicated dev01 Docker CLI workflow with pinned PostgreSQL 18.7 and Python
+  3.12.16 images, optional hash-locked Psycopg 3.3.9, separate internal source/restore
+  networks and volumes, frozen writes, native custom-format backup and transactional
+  restore. Host wheel downloads precede a build with networking disabled.
+- Retain checksummed backups and sanitized run evidence outside the repository.
+  Journal installation/run/resource UUIDs and nonces before mutations; check live
+  identities before cleanup, preserve ambiguous creation outcomes, serialize cleanup
+  with execution, and refuse to overwrite existing run artifacts. Interrupted runs
+  can reconcile cleanup but cannot silently restart recovery or its timer.
+- Add 44 offline safety/application/verifier tests and two explicitly gated Docker
+  integration cases. Inventory runtime dependencies, deployed controller, lab
+  infrastructure, expired credentials, VM 9000 and LICENSE are unchanged.
+
+Validation on dev01: **316 offline tests passed, 2 Docker tests skipped by default**;
+Ruff lint/format and dependency checks passed. A real local CLI exercise recovered
+all 100 orders, passed SQL/schema/API checks and the distinct canary, and completed
+owned cleanup. Its measured exercise recovery duration was **30.17 seconds**;
+backup **4,588 bytes**, SHA-256 and full phase boundaries retained. A second real
+CLI exercise changed a restored customer field while preserving the row count:
+verification failed as intended before the canary, and cleanup completed.
+All retained artifact checksums were independently rechecked. Earlier development
+attempts remain failed in their reports, with cleanup reconciled/completed.
+The explicit Docker integration command also passed **2 tests** against the final
+source (success plus altered-record rejection), with owned cleanup complete; its
+successful repeat measured **32.63 seconds**. Ordinary tests additionally block
+Psycopg's C-level network entry point. Wheel/source builds and packaged-resource
+checks passed from a staged copy outside the repository.
+The final credential-separation repeat also passed both integration cases; its
+successful recovery measured **29.41 seconds**. Administrator credentials are
+generated separately and never mounted into the application container.
+See the [runbook and dated evidence](docs/local-postgres-exercise.md).
+
+This proves only the frozen synthetic local logical-recovery workflow. It does not
+prove guest execution, production RTO/RPO, concurrent-write consistency, PITR,
+incremental recovery or host fault tolerance. No commits, pushes or deployment.
+
 ## Unreleased — 13 November 2026 offline evidence review
 
 These source changes are **not deployed** and have **not been validated through

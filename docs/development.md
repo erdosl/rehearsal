@@ -14,7 +14,14 @@ python3 -m venv .venv
 
 Venv bootstrap was verified on `dev01` with Python 3.12.3/pip 24.0. If bootstrap fails, report the specific venv/ensurepip prerequisite (`python3.12-venv` on this Ubuntu guest); do not install into system Python. Initial installation needs an approved package index or cached wheels. Application checks/tests then run offline.
 
-HTTPX 0.28.1 is the only direct runtime dependency: it supplies HTTPS, explicit timeouts, streaming responses and [mock transport](https://www.python-httpx.org/advanced/transports/), avoiding a custom HTTP stack or a retry framework. Its transitives are hash pinned in `requirements-runtime.lock`. The development lock includes runtime dependencies plus pytest, Ruff, build and setuptools and their transitives. Locks target Python 3.12/Linux x86_64. There is no Docker, PostgreSQL, GitHub-authentication or SSH dependency for tests.
+HTTPX 0.28.1 is the only direct inventory runtime dependency: it supplies HTTPS,
+explicit timeouts, streaming responses and [mock transport](https://www.python-httpx.org/advanced/transports/).
+Its transitives are hash pinned in `requirements-runtime.lock`. The development
+lock includes runtime dependencies, optional Psycopg for the order application,
+pytest, Ruff, build, setuptools and their transitives. Locks target Python 3.12/Linux
+x86_64. Ordinary tests need no Docker server, PostgreSQL server, GitHub authentication
+or SSH. Docker integration is separately gated; see the
+[local exercise runbook](local-postgres-exercise.md).
 
 ## Offline commands
 
@@ -139,6 +146,13 @@ With delivered wheels, add `--no-index --find-links /path/to/runtime-wheels` to 
 
 ## Refreshing dependency locks
 
+The local application milestone passes **316 offline tests** and **2 separately
+opted-in Docker integration tests** on 13 November 2026. Unit guards block both
+Python sockets/DNS and Psycopg's C-level connection entry point; Docker calls are
+blocked unless the integration marker, command-line flag and environment opt-in
+are present. The [runbook](local-postgres-exercise.md) retains real CLI and repeat
+integration evidence. These checks do not contact the lab or change deployment.
+
 Keep `requirements-runtime.in` and the runtime pin in `pyproject.toml` aligned; keep setuptools aligned with the build requirement. Use fresh empty download directories and review lock diffs. The stdlib helper reads downloaded wheel metadata/hashes, performs no resolution/network access, and rejects duplicate distributions.
 
 ```bash
@@ -146,6 +160,10 @@ Keep `requirements-runtime.in` and the runtime pin in `pyproject.toml` aligned; 
 .venv/bin/python tools/lock_dev_dependencies.py .cache/runtime-lock-refresh --source requirements-runtime.in --scope 'Runtime dependencies' > requirements-runtime.lock
 .venv/bin/python -m pip download --only-binary=:all: --dest .cache/dev-lock-refresh -r requirements-dev.in
 .venv/bin/python tools/lock_dev_dependencies.py .cache/dev-lock-refresh > requirements-dev.lock
+
+# Optional application lock, also included by requirements-dev.in:
+.venv/bin/python -m pip download --only-binary=:all: --dest .cache/exercise-lock-refresh -r requirements-exercise.in
+.venv/bin/python tools/lock_dev_dependencies.py .cache/exercise-lock-refresh --source requirements-exercise.in --scope 'Optional application dependencies' > requirements-exercise.lock
 ```
 
 Do not reuse directories containing stale wheels. Resolution/download needs an approved package index; rendering does not. Runtime locks exclude test/build tools. The existing wheel was deployed unchanged; documentation updates after that deployment do not imply a rebuilt 0.2.0 artifact. See the [live deployment runbook](live-inventory.md#verified-deployment-record) for verified installation and repeatable checks.

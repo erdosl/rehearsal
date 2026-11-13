@@ -3,3 +3,5 @@ recursive-include docs *.md
 recursive-include examples *.toml *.nft *.service
 recursive-include tests *.py
 recursive-include tools *.py
+include .dockerignore
+recursive-include docker *.Dockerfile

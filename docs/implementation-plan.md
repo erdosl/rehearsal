@@ -120,6 +120,26 @@ Do not proceed to application deployment if real nested boot, isolation or clean
 
 ## Milestone 4 — Application and verified PostgreSQL recovery
 
+### Implemented local slice (independent of milestone 3)
+
+The user's separately authorized [dev01 Docker exercise](local-postgres-exercise.md)
+implements the first application-level recovery without nested execution. It has
+a small synchronous order API, versioned SQL initialization, independent intended
+manifest, native dump/restore into a distinct cluster/volume/network, exact SQL and
+HTTP comparison, schema/constraint checks, post-restore write/read, durable local
+evidence and owned cleanup. No worker, guest provisioning, upgrade/rollback or
+controller deployment is included. This local work does not relax any milestone-3
+gate. The acceptance criteria below still describe the larger future guest slice.
+
+Verified on dev01, 13 November: one real logical recovery passed exact checks for
+100 orders, schema constraints and the separate canary, with 30.17 seconds measured
+exercise recovery duration and complete cleanup. A real same-count altered-field
+case failed before the canary and cleaned up. Local validation passes 316 offline
+tests; the explicit Docker integration command additionally passed both success
+and altered-record cases against the final source (excluded by default).
+See dated evidence in
+the runbook; these results do not pass any nested-guest acceptance criterion.
+
 **Goal:** demonstrate independently checked application behaviour and recovery of a deterministic dataset into a different isolated VM.
 
 Work:
@@ -195,3 +215,8 @@ unknown mutation outcome separate. Executor, workload/recovery, UI and Actions
 remain future work. Keep inventory credentials unchanged; the separate bootstrap
 expiry **2026-11-13 15:08:20 UTC** has passed, with no renewal or broader rights
 authorized by development. No CPU/network/hypervisor changes are part of this work.
+
+The separately authorized local application/recovery slice above is now implemented
+and verified independently of those guest/controller blockers. The remaining
+workload/recovery references in this historical blocker list concern the guest
+deployment and controller executor, not the dev01 Docker exercise.

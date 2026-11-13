@@ -1,0 +1,11 @@
+**
+!docker/
+!docker/orders.Dockerfile
+!requirements-exercise.lock
+!wheels/
+!wheels/*.whl
+!src/
+!src/rehearsal_orders/
+!src/rehearsal_orders/**
+!src/rehearsal_exercise/
+!src/rehearsal_exercise/**
