@@ -1,0 +1,93 @@
+name: Public checks
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: public-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: false
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  offline:
+    name: Offline checks
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6.3.0
+        with:
+          python-version: '3.12.16'
+          architecture: x64
+      - name: Install hash-locked development environment
+        run: |
+          python -m venv .venv
+          .venv/bin/python -m pip install --require-hashes -r requirements-dev.lock
+          .venv/bin/python -m pip install --no-index --no-build-isolation --no-deps -e .
+      - name: Unit, style, dependencies and package smoke checks
+        run: .venv/bin/python tools/ci_checks.py offline --output "$RUNNER_TEMP/publish/offline.json"
+      - name: Retain check outcomes
+        if: always()
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
+        with:
+          name: offline-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/publish/offline.json
+          retention-days: 7
+          if-no-files-found: warn
+          include-hidden-files: false
+
+  recovery:
+    name: Docker recovery
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    concurrency:
+      group: public-docker-recovery
+      cancel-in-progress: false
+    env:
+      REHEARSAL_LIVE: '1'
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6.3.0
+        with:
+          python-version: '3.12.16'
+          architecture: x64
+      - name: Install hash-locked development environment
+        run: |
+          python -m venv .venv
+          .venv/bin/python -m pip install --require-hashes -r requirements-dev.lock
+          .venv/bin/python -m pip install --no-index --no-build-isolation --no-deps -e .
+      - name: Success and altered-record rejection
+        run: .venv/bin/python tools/ci_checks.py docker --root "$RUNNER_TEMP/rehearsal-docker" --output "$RUNNER_TEMP/publish/docker-checks.json"
+      - name: Reconcile owned cleanup
+        if: always()
+        timeout-minutes: 3
+        run: .venv/bin/python -m rehearsal_exercise.ci cleanup --live --root "$RUNNER_TEMP/rehearsal-docker"
+      - name: Export allowlisted evidence
+        if: always()
+        run: |
+          .venv/bin/python -m rehearsal_exercise.ci export --root "$RUNNER_TEMP/rehearsal-docker" --output "$RUNNER_TEMP/publish/recovery.json"
+          echo 'Recovery evidence contains counts, outcomes, checksums and durations; backups and raw diagnostics are excluded.' >> "$GITHUB_STEP_SUMMARY"
+      - name: Retain sanitized evidence
+        if: always()
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
+        with:
+          name: recovery-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            ${{ runner.temp }}/publish/docker-checks.json
+            ${{ runner.temp }}/publish/recovery.json
+          retention-days: 7
+          if-no-files-found: warn
+          include-hidden-files: false

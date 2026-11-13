@@ -1,5 +1,17 @@
 # Changelog
 
+## Public CI — local implementation, not yet run on GitHub
+
+Add separate Ubuntu-hosted offline and Docker recovery jobs with SHA-pinned
+official actions, read-only repository permissions, bounded concurrency/timeouts,
+best-effort owned cleanup and seven-day metadata artifacts. Public PR jobs have no
+lab credentials or self-hosted runner. Export only an allowlisted projection;
+backups, credentials, connection details and raw reports/logs are not uploaded.
+Add injection/numeric-boundary tests and locally validate the workflow with
+checksum-verified actionlint 1.7.12 and its underlying job commands. See
+[CI runbook](docs/ci.md). No push or repository-settings change; remote execution
+is untested.
+
 ## Recovery milestone review — 13 November 2026
 
 Reviewed source/target separation, independent intended input, SQL/schema/API

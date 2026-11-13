@@ -96,6 +96,7 @@ Offline tests run with synthetic credentials and mock transport, without Proxmox
 ## Design documents
 
 - [Development rules and boundaries](AGENTS.md)
+- [Public GitHub-hosted CI, pins and sanitized artifacts](docs/ci.md)
 - [Environment evidence, supplied information and unknowns](docs/environment.md)
 - [Architecture, isolation, recovery evidence and CI trust](docs/architecture.md)
 - [Implementation milestones and acceptance criteria](docs/implementation-plan.md)
