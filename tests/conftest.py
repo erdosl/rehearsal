@@ -44,6 +44,9 @@ def no_network(monkeypatch):
     import psycopg
 
     monkeypatch.setattr(psycopg, "connect", denied)
+    from rehearsal_exercise.guest_transport import SSH
+
+    monkeypatch.setattr(SSH, "_execute", denied)
 
 
 @pytest.fixture

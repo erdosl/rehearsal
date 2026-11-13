@@ -1,5 +1,13 @@
 # Phased implementation plan
 
+Local continuation: the reviewed recovery milestone and public hosted CI are
+implemented, with CI still untested remotely. The [prepared-guest integration](prepared-proxmox-exercise.md)
+shares the same recovery workflow over pinned SSH and native tools, reuses durable
+request/UPID handling and protects borrowed guest services with explicit leases.
+Its end-to-end guest cases are simulations; live preparation, boot/isolation,
+capacity (including the two-guest exception), controller delivery and actual guest
+recovery remain unvalidated. No VM lifecycle writes or lab changes were made.
+
 **13 November 2026 development update:** [the supplied investigation handoff](investigation-2026-11-13.md)
 supersedes the 12 November infrastructure summary below. Offline work implements
 request timing/HTTP/transport/UPID-provenance evidence and preserves task results

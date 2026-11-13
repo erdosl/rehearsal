@@ -132,18 +132,19 @@ class Evidence:
         atomic_json(self.directory / "report.json", self.data)
         data = self.data
         lines = [
-            f"# Local synthetic PostgreSQL exercise {data['run']}",
+            f"# Synthetic PostgreSQL exercise {data['run']}",
             f"Outcome: {data['outcome']}; cleanup: {data['cleanup']}",
             f"Phase: {data['phase']}",
             f"Failure: {data.get('failure', 'none')}",
+            f"Cleanup scope: {data.get('cleanup_scope', 'owned Docker resources')}",
             "",
             "Measured exercise recovery duration: "
             + json.dumps(data.get("recovery", {"complete": False}), sort_keys=True),
             "",
-            "Boundaries: immediately before allocating the restore network/volume/instance, "
-            "through recovered SQL/schema/API verification and the separate "
-            "post-restore write/read.",
-            "Image preparation, source preparation, backup and cleanup are outside that interval.",
+            "Start boundary: " + data.get("recovery", {}).get("start_boundary", "not reached"),
+            "End boundary: " + data.get("recovery", {}).get("end_boundary", "not reached"),
+            "Prepared guests exclude allocation/boot; Docker includes restore allocation. "
+            "Source preparation, backup and cleanup are outside the recovery interval.",
             "Frozen synthetic writes only; no production RTO/RPO, PITR or incremental "
             "recovery claim.",
             "Backups and manifests remain outside disposable volumes; manual retention, "

@@ -112,6 +112,12 @@ not a remedy; pve01 requires nested AMD-V for its intended KVM workload.
 
 ## Development and live validation
 
+Subsequent local work adds [public hosted CI](ci.md) and an independently testable
+[prepared-guest recovery slice and supervised procedure](prepared-proxmox-exercise.md).
+Those implementations are not live retests, do not change this incident's evidence
+or root-cause status, and do not authorize VM 9000 changes. Kernel/component
+maintenance still has no controlled nested-start validation establishing a fix.
+
 Continue local implementation and network-blocked tests independently of host
 diagnosis. New mutation evidence is described in
 [the supervised tooling contract](supervised-build.md#offline-request-evidence-13-november-2026).

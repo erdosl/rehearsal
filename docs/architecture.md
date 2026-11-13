@@ -1,5 +1,14 @@
 # Proposed architecture
 
+The [prepared-guest slice](prepared-proxmox-exercise.md) now shares the implemented
+exercise orchestration, application, verifier and evidence with Docker. It supplies
+authenticated SSH/native PostgreSQL transport, guest leases/receipts and read-only
+Proxmox admission/task reconciliation. It deliberately requires prepared guests and
+does not implement VM provisioning/power/deletion or a controller executor. Its
+guest behaviour is offline-tested/simulated, not live-verified. Public hosted
+[CI](ci.md) is implemented locally but has no remote run evidence. Neither change
+relaxes the unresolved-host-fault risk or current one-running-guest ceiling.
+
 ## Implemented local application slice — 13 November 2026
 
 The [local PostgreSQL exercise](local-postgres-exercise.md) implements a separate

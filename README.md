@@ -14,6 +14,12 @@ changes. See the runbook for exact opt-ins, image pins, retained artifacts and
 measured exercise recovery duration boundaries. Guest deployment, worker and
 infrastructure recovery remain future work.
 
+Public [GitHub-hosted CI](docs/ci.md) and the
+[prepared Proxmox guest transport](docs/prepared-proxmox-exercise.md) are now
+implemented locally. The latter shares the recovery workflow but has only offline
+contract validation; guest preparation/power/provisioning and live acceptance are
+separate gates. CI has not run on GitHub. No lab deployment or VM mutation occurred.
+
 **13 November 2026:** the [investigation handoff](docs/investigation-2026-11-13.md)
 supersedes the historical snapshot below. Supplied host evidence establishes two
 VirtualBox NULL-pointer faults; root cause and a fix remain unresolved. VM 9000
@@ -97,6 +103,7 @@ Offline tests run with synthetic credentials and mock transport, without Proxmox
 
 - [Development rules and boundaries](AGENTS.md)
 - [Public GitHub-hosted CI, pins and sanitized artifacts](docs/ci.md)
+- [Prepared Proxmox guest integration and bounded live-validation plan](docs/prepared-proxmox-exercise.md)
 - [Environment evidence, supplied information and unknowns](docs/environment.md)
 - [Architecture, isolation, recovery evidence and CI trust](docs/architecture.md)
 - [Implementation milestones and acceptance criteria](docs/implementation-plan.md)

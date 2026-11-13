@@ -1,5 +1,28 @@
 # Changelog
 
+## Prepared Proxmox guests — offline integration slice
+
+Share the actual recovery orchestration, manifest, SQL/schema/API verifier, native
+archive checks, canary and evidence between Docker and prepared guest transport.
+Add strict protected bindings, verified-TLS read-only Proxmox admission, pinned
+SSH, machine/release checks, guest leases, checksummed archive transfer and durable
+command receipts. Reuse the existing SQLite request journal and exact recorded-UPID
+reconciler; preserve ambiguity and reject all Proxmox mutation calls. Cleanup stops
+only leased services and retains prepared VMs/disks and observer evidence.
+
+Add offline success/failure contracts and a concrete separately authorizable live
+procedure. Guest tests simulate protocol responses, not real PostgreSQL/SSH/Proxmox
+execution. No live retest, provisioning, VM 9000 change, expired-token renewal,
+allocation/network/firewall change or controller deployment occurred. The host
+faults remain close in time to starts with unresolved root cause; a single vCPU did
+not prevent the later fault, and subsequent maintenance has not established a fix.
+See [implementation and remaining live gates](docs/prepared-proxmox-exercise.md).
+
+Final local validation: **354 offline tests**, including **26 guest contracts**;
+two real Docker cases after the shared-runner changes; Ruff, dependency checks,
+configuration validation, actionlint and package/install/resource smoke checks
+passed. These results establish no live guest/SSH/Proxmox or GitHub-hosted success.
+
 ## Public CI — local implementation, not yet run on GitHub
 
 Add separate Ubuntu-hosted offline and Docker recovery jobs with SHA-pinned

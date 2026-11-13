@@ -55,11 +55,19 @@ def main():
             "rehearsal_exercise/images.toml",
             "rehearsal_exercise/runner.py",
             "rehearsal_orders/domain.py",
+            "rehearsal_exercise/guest_agent.py",
+            "rehearsal_exercise/guests.py",
         ):
             if archive.read(relative) != (project / "src" / relative).read_bytes():
                 raise RuntimeError("packaged resource mismatch")
     with tarfile.open(next((staging / "dist").glob("*.tar.gz"))) as archive:
-        for required in (".dockerignore", "docker/orders.Dockerfile", "tests/conftest.py"):
+        for required in (
+            ".dockerignore",
+            "docker/orders.Dockerfile",
+            "tests/conftest.py",
+            "examples/prepared-guests.toml",
+            "examples/guest-orders.service",
+        ):
             if not any(name.endswith("/" + required) for name in archive.getnames()):
                 raise RuntimeError("source archive resource missing")
     installed = staging / "installed"

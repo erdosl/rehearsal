@@ -47,6 +47,8 @@ def phase(evidence, name):
 
 
 class Runner:
+    recovery_start_boundary = "before restore network, volume and instance allocation"
+
     def __init__(self, evidence, project, fault="none", docker=None):
         self.evidence = evidence
         self.project = Path(project)
@@ -57,13 +59,17 @@ class Runner:
         self.instances = {}
         self.recovery_started = None
 
+    def native(self, instance, args, **kwargs):
+        return self.docker.call(["exec", "-i", instance["container"], *args], **kwargs)
+
+    def app_command(self, app, args, **kwargs):
+        return self.docker.call(["exec", "-i", app["id"], *args], **kwargs)
+
     def sql(self, instance, query, *, operation="sql_read", mutation=False):
         return (
-            self.docker.call(
+            self.native(
+                instance,
                 [
-                    "exec",
-                    "-i",
-                    instance["container"],
                     "psql",
                     "-X",
                     "-v",
@@ -87,8 +93,9 @@ class Runner:
 
     def http(self, app, requests, *, mutation=False):
         return json.loads(
-            self.docker.call(
-                ["exec", "-i", app["id"], "python", "-m", "rehearsal_exercise.http_client"],
+            self.app_command(
+                app,
+                ["python", "-m", "rehearsal_exercise.http_client"],
                 operation="http_write" if mutation else "http_read",
                 mutation=mutation,
                 data=json.dumps(requests).encode(),
@@ -132,6 +139,9 @@ class Runner:
             raise ExerciseError("project source with docker/orders.Dockerfile required")
         self.evidence.data["images"] = self.images
         self.evidence.data["fault"] = self.fault
+        self.prepare_manifest()
+
+    def prepare_manifest(self):
         atomic_json(self.evidence.directory / "manifest.json", self.expected)
         self.evidence.data["manifest_sha256"] = sha256(self.evidence.directory / "manifest.json")
         # Record exactly the workload/verifier/config/build inputs, including uncommitted changes.
@@ -430,23 +440,18 @@ class Runner:
     def versions(self, source):
         result = {
             "server": self.sql(source, "SHOW server_version;"),
-            "pg_dump": self.docker.call(["exec", source["container"], "pg_dump", "--version"])
-            .decode()
-            .strip(),
-            "pg_restore": self.docker.call(["exec", source["container"], "pg_restore", "--version"])
-            .decode()
-            .strip(),
+            "pg_dump": self.native(source, ["pg_dump", "--version"]).decode().strip(),
+            "pg_restore": self.native(source, ["pg_restore", "--version"]).decode().strip(),
             "application": json.loads(
-                self.docker.call(
+                self.app_command(
+                    source["app"],
                     [
-                        "exec",
-                        source["app"]["id"],
                         "python",
                         "-c",
                         "import json,platform,psycopg; "
                         "print(json.dumps({'python':platform.python_version(),"
                         "'psycopg':psycopg.__version__,'libpq':psycopg.pq.version()}))",
-                    ]
+                    ],
                 )
             ),
         }
@@ -475,11 +480,7 @@ class Runner:
         self.evidence.save()
 
     def quiesce(self, source):
-        self.docker.call(
-            ["stop", "--time", "5", source["app"]["id"]],
-            operation="stop_source_writers",
-            mutation=True,
-        )
+        self.stop_app(source)
         self.sql(
             source,
             "ALTER ROLE order_app NOLOGIN; SELECT pg_terminate_backend(pid) "
@@ -509,10 +510,9 @@ class Runner:
             raise ExerciseError("insufficient evidence space before backup")
         partial = directory / "backup.partial"
         with partial.open("xb") as stream:
-            self.docker.call(
+            self.native(
+                source,
                 [
-                    "exec",
-                    source["container"],
                     "pg_dump",
                     "-U",
                     "postgres",
@@ -539,8 +539,9 @@ class Runner:
         atomic_json(directory / "backup-checksum.json", self.evidence.data["backup"])
         with (directory / "backup.dump").open("rb") as stream:
             # Listing is only an archive sanity check; recovery still needs independent checks.
-            self.docker.call(
-                ["exec", "-i", source["container"], "pg_restore", "--list"],
+            self.native(
+                source,
+                ["pg_restore", "--list"],
                 source=stream,
                 operation="archive_list",
             )
@@ -598,11 +599,9 @@ class Runner:
             restore_input = self.evidence.directory / "corrupt-backup.dump"
             restore_input.write_bytes(backup.read_bytes()[:64])
         with restore_input.open("rb") as stream:
-            self.docker.call(
+            self.native(
+                target,
                 [
-                    "exec",
-                    "-i",
-                    target["container"],
                     "pg_restore",
                     "-U",
                     "postgres",
@@ -669,17 +668,13 @@ class Runner:
         with phase(self.evidence, "backup"):
             self.backup(source)
         with phase(self.evidence, "source_shutdown"):
-            self.docker.call(
-                ["stop", "--time", "10", source["container"]],
-                operation="stop_source_database",
-                mutation=True,
-            )
+            self.stop_database(source)
         self.recovery_started = time.monotonic()
         self.evidence.data["recovery"] = {
             "label": "measured exercise recovery duration",
             "started_utc": utc(),
             "complete": False,
-            "start_boundary": "before restore network, volume and instance allocation",
+            "start_boundary": self.recovery_start_boundary,
             "end_boundary": "recovered SQL/schema/API checks and separate "
             "post-restore write/read passed",
         }
@@ -708,19 +703,7 @@ class Runner:
             self.verify_sql("restore")
         with phase(self.evidence, "restored_application"):
             app = self.app("restore")
-            mapping = json.loads(
-                self.docker.call(
-                    [
-                        "container",
-                        "inspect",
-                        "--format",
-                        "{{json .NetworkSettings.Networks}}",
-                        app["id"],
-                    ]
-                )
-            )
-            if [value["NetworkID"] for value in mapping.values()] != [target["network"]]:
-                raise ExerciseError("restored API is not exclusively on restore network")
+            self.assert_app_target(target, app)
             self.assert_target(source, target)
             self.verify_http("restore")
         with phase(self.evidence, "post_restore_write_read"):
@@ -733,6 +716,38 @@ class Runner:
         # Source storage is still present, deliberately stopped and never restored over.
         self.evidence.data["checks"]["source_preserved_until_cleanup"] = {"passed": True}
         self.evidence.save()
+
+    def stop_app(self, instance):
+        self.docker.call(
+            ["stop", "--time", "5", instance["app"]["id"]],
+            operation="stop_source_writers",
+            mutation=True,
+        )
+
+    def stop_database(self, instance):
+        self.docker.call(
+            ["stop", "--time", "10", instance["container"]],
+            operation="stop_source_database",
+            mutation=True,
+        )
+
+    def assert_app_target(self, instance, app):
+        mapping = json.loads(
+            self.docker.call(
+                [
+                    "container",
+                    "inspect",
+                    "--format",
+                    "{{json .NetworkSettings.Networks}}",
+                    app["id"],
+                ]
+            )
+        )
+        if [value["NetworkID"] for value in mapping.values()] != [instance["network"]]:
+            raise ExerciseError("restored API is not exclusively on restore network")
+
+    def cleanup(self):
+        return self.docker.cleanup()
 
 
 def perform_run(root, run_id, project, fault="none", runner_factory=Runner):
@@ -764,7 +779,10 @@ def perform_run(root, run_id, project, fault="none", runner_factory=Runner):
         evidence.report()  # Failure evidence must survive even if cleanup is interrupted.
         try:
             with phase(evidence, "cleanup"):
-                runner.docker.cleanup()
+                if hasattr(runner, "cleanup"):
+                    runner.cleanup()
+                else:
+                    runner.docker.cleanup()
                 if evidence.data["cleanup"] != "complete":
                     raise ExerciseError("owned cleanup remains pending")
         except ExerciseError:

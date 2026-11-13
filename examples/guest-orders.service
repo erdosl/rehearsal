@@ -1,0 +1,17 @@
+[Unit]
+Description=Rehearsal synthetic order API (prepared guest only)
+After=postgresql@18-main.service
+
+[Service]
+User=rehearsal-order
+Group=rehearsal-order
+Environment=PGHOST=127.0.0.1 PGPORT=5432 PGDATABASE=orders PGUSER=order_app
+Environment=ORDER_PASSWORD_FILE=/etc/rehearsal/order-password PYTHONDONTWRITEBYTECODE=1
+UnsetEnvironment=PGHOSTADDR PGSERVICE PGSERVICEFILE
+ExecStart=/opt/rehearsal/venv/bin/python -m rehearsal_orders --bind 127.0.0.1 --port 8080
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectSystem=strict
+ProtectHome=yes
+RestrictAddressFamilies=AF_INET AF_UNIX
+Restart=no
