@@ -1,0 +1,26 @@
+# Proposal only. No admitted guests: vmbr1 is closed in both directions.
+# Replace only this owned table, atomically; never flush the whole ruleset.
+add table bridge rehearsal_test
+delete table bridge rehearsal_test
+table bridge rehearsal_test {
+    chain input {
+        type filter hook input priority -300; policy accept;
+        meta ibrname "vmbr1" counter drop
+    }
+
+    chain output {
+        type filter hook output priority -300; policy accept;
+        meta obrname "vmbr1" counter drop
+    }
+
+    chain forward {
+        type filter hook forward priority -300; policy accept;
+        meta ibrname "vmbr1" jump guest_pairs
+        meta obrname "vmbr1" jump guest_pairs
+    }
+
+    chain guest_pairs {
+        # Future admission inserts exact port/MAC/IP pair rules here.
+        counter drop
+    }
+}

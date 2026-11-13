@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "simulated": true,
+  "description": "Synthetic demonstration data, not an inspection of the real lab.",
+  "inventory": {
+    "version": "9.2.2-simulated",
+    "nodes": [
+      {"name": "sim-pve01", "status": "online", "cpus": 2, "memory_total_bytes": 12884901888}
+    ],
+    "storage": [
+      {
+        "node": "sim-pve01", "name": "sim-local-lvm", "kind": "lvmthin", "active": true,
+        "total_bytes": 11811160064, "used_bytes": 1073741824, "available_bytes": 10737418240
+      }
+    ],
+    "vms": [
+      {"node": "sim-pve01", "vmid": 9000, "name": "sim-template", "status": "stopped", "template": true}
+    ],
+    "networks": [
+      {
+        "node": "sim-pve01", "name": "sim-vmbr0", "kind": "bridge", "active": true,
+        "cidr": "192.0.2.80/24", "ports": ["sim-nic0"]
+      }
+    ]
+  }
+}

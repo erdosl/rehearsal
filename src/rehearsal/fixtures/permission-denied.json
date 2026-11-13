@@ -1,0 +1,6 @@
+{
+  "schema_version": 1,
+  "simulated": true,
+  "description": "Synthetic permission failure; no real API request is made.",
+  "failure": {"code": "permission_denied"}
+}

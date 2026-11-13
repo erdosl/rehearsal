@@ -1,0 +1,5 @@
+include AGENTS.md CHANGELOG.md requirements-*.in requirements-*.lock
+recursive-include docs *.md
+recursive-include examples *.toml *.nft *.service
+recursive-include tests *.py
+recursive-include tools *.py

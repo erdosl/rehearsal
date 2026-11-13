@@ -1,0 +1,14 @@
+# Fully synthetic offline example. These are not observations of pve01.
+schema_version = 1
+
+[inventory]
+nodes = ["sim-pve01"]
+fixture = "builtin:healthy"
+
+# Optional API settings: validated structurally, never used by fixture inventory.
+# This example contains references only, not credentials. Files need not exist offline.
+[proxmox]
+endpoint = "https://pve.example.invalid:8006"
+verify_tls = true
+ca_file = "/etc/rehearsal/pve-ca.crt"
+token_file = "/run/credentials/rehearsal/pve-token"

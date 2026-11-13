@@ -1,0 +1,19 @@
+# Separate supervised tool configuration; not accepted by the inventory CLI.
+[build]
+endpoint = "https://192.0.2.80:8006"
+ca_file = "/etc/rehearsal/pve-ca.crt"
+token_file = "/etc/rehearsal/bootstrap-9000.json"
+state_directory = "/var/lib/rehearsal/supervised/first-guest"
+node = "sim-pve01"
+storage = "sim-rehearsal-lvm"
+bridge = "vmbr-test"
+pool = "sim-rehearsal"
+vmid = 9000
+name = "rehearsal-noble-build"
+guest_ip = "10.77.0.10/24"
+guest_mac = "02:00:00:00:90:00"
+controller_ip = "10.77.0.1"
+controller_mac = "02:00:00:00:00:01"
+cores = 1
+memory_mib = 2048
+disk_gib = 12

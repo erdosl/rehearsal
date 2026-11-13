@@ -1,0 +1,27 @@
+# Proposal only. The guest set is empty until separate, owned admission.
+add table inet rehearsal_test
+delete table inet rehearsal_test
+table inet rehearsal_test {
+    set guests4 {
+        type ether_addr . ipv4_addr;
+    }
+
+    chain input {
+        type filter hook input priority -10; policy accept;
+        iifname "enp0s9" jump test_input
+    }
+
+    chain test_input {
+        # Only replies to controller-originated SSH and ping, to the test IP.
+        ether saddr . ip saddr @guests4 ip daddr 10.77.0.1 ct direction reply ct state established tcp sport 22 counter accept
+        ether saddr . ip saddr @guests4 ip daddr 10.77.0.1 ct direction reply ct state established icmp type echo-reply counter accept
+        ether saddr . ip saddr @guests4 ip daddr 10.77.0.1 ct state related icmp type { destination-unreachable, time-exceeded, parameter-problem } counter accept
+        counter drop
+    }
+
+    chain forward {
+        type filter hook forward priority -10; policy accept;
+        iifname "enp0s9" counter drop
+        oifname "enp0s9" counter drop
+    }
+}

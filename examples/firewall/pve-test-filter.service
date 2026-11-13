@@ -1,0 +1,17 @@
+[Unit]
+Description=Rehearsal dedicated test bridge guard
+DefaultDependencies=no
+After=local-fs.target
+Wants=network-pre.target
+Before=network-pre.target pve-guests.service shutdown.target
+Conflicts=shutdown.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/sbin/nft -f /etc/rehearsal-firewall/test-filter.nft
+ExecReload=/usr/sbin/nft -f /etc/rehearsal-firewall/test-filter.nft
+ExecStop=/usr/sbin/nft delete table bridge rehearsal_test
+
+[Install]
+WantedBy=multi-user.target

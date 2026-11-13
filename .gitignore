@@ -1,0 +1,23 @@
+# Local tooling and build output
+.venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+build/
+dist/
+.cache/
+
+# Local configuration, credentials and run evidence
+.env
+.env.*
+rehearsal.local.toml
+credentials/
+secrets/
+api-token.json
+*.key
+*.pem
+*.dump
+*.sqlite3*
+runs/

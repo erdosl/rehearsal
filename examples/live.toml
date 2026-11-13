@@ -1,0 +1,16 @@
+# Deployment example only: no token or CA material is included.
+# Use this IP endpoint only when its certificate contains IP SAN 192.168.56.80.
+schema_version = 1
+
+[inventory]
+nodes = ["pve01"]
+
+[proxmox]
+endpoint = "https://192.168.56.80:8006"
+verify_tls = true
+ca_file = "/etc/rehearsal/pve-ca.crt"
+token_file = "/etc/rehearsal/api-token.json"
+connect_timeout_seconds = 3
+read_timeout_seconds = 15
+request_deadline_seconds = 30
+max_attempts = 3

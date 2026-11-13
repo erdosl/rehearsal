@@ -1,0 +1,2 @@
+# Single direct runtime dependency; keep aligned with pyproject.toml.
+httpx==0.28.1
